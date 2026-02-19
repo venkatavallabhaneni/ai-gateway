@@ -22,4 +22,9 @@ public class AiGatewayController {
     public EmbedResponse embed(@Valid @RequestBody EmbedRequest req) {
         return aiGatewayService.embed(req);
     }
+
+    @PostMapping("/cosine-similarity")
+    public EmbedResponseWithCosineSImilarity cosineSimilarity(@RequestBody EmbedSetRequest req) {
+        return aiGatewayService.cosineSimilarityStats(req); // Replace "model" with the appropriate model selection logic  
+    }
 }

@@ -22,7 +22,7 @@ public class ModelRouter {
       case "reasoning": // choose stronger later
         return props.getDefaultChatModel();
       default:
-        return props.getDefaultChatModel();
+        return props.getDefaultEmbedModel();
     }
   }
 
