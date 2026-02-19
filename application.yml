@@ -1,0 +1,53 @@
+server:
+  port: 8085
+
+ai:
+  provider:
+    baseUrl: "https://api.openai.com/v1"   # for OpenAI
+    apiKey: "${OPENAI_API_KEY}"
+    chatPath: "/chat/completions"
+    embedPath: "/embeddings"
+    # defaults (can be overridden by request)
+    defaultChatModel: "gpt-4o-mini"
+    defaultEmbedModel: "text-embedding-3-small"
+    maxInputChars: 20000
+    maxOutputTokens: 800
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+resilience4j:
+  ratelimiter:
+    instances:
+      llmProvider:
+        limitForPeriod: 60          # 60 requests
+        limitRefreshPeriod: 1s      # per second
+        timeoutDuration: 200ms
+
+  circuitbreaker:
+    instances:
+      llmProvider:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 20
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 2s
+        permittedNumberOfCallsInHalfOpenState: 5
+        waitDurationInOpenState: 10s
+
+  retry:
+    instances:
+      llmProvider:
+        maxAttempts: 3
+        waitDuration: 200ms
+        retryExceptions:
+          - java.io.IOException
+          - java.net.SocketTimeoutException
+
+  bulkhead:
+    instances:
+      llmProvider:
+        maxConcurrentCalls: 20
+        maxWaitDuration: 50ms
